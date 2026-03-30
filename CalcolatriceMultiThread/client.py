@@ -9,22 +9,22 @@ import threading      # Per gestire l'esecuzione parallela (multithreading)
 
 # --- Configurazione ---
 HOST = "127.0.0.1"           # IP del server
-PORT = 22224                # Porta del server (assicurarsi che il server stia ascoltando su questa)
+PORT = 65432                # Porta del server (assicurarsi che il server stia ascoltando su questa)
 NUM_WORKERS = 15            # Numero di richieste (thread) da inviare in parallelo
 OPERAZIONI = ["+", "-", "*", "/", "%"]  # Lista delle operazioni consentite
 
-#1 Aggiungi commento
+#1 Genera le richieste di connessione 
 def genera_richieste(address, port):
-    #2 Aggiungi commento
+    #2 Crea un socket
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock_service:
         sock_service.connect((address, port))  # Connessione al server
 
-        #3 Aggiungi commento
+        #3 Generazione casuale dei numeri
         primoNumero = random.randint(0, 100)
         operazione = OPERAZIONI[random.randint(0, 3)]  # Scegli operazione a caso (tra le prime 4)
         secondoNumero = random.randint(0, 100)
 
-        #4 Aggiungi commento
+        #4 Creazione del messaggio da inviare al server
         messaggio = {
             "primoNumero": primoNumero,
             "operazione": operazione,
@@ -32,16 +32,16 @@ def genera_richieste(address, port):
         }
         messaggio = json.dumps(messaggio)
 
-        ##5 Aggiungi commento
+        #5 Codifica la stringa JSON in byte
         sock_service.sendall(messaggio.encode("UTF-8"))
 
-        #6 Aggiungi commento
+        #6 Inizio del tempo della connessione del thread
         start_time_thread = time.time()
 
-        #7 Aggiungi commento
+        #7 Attende risposta del server
         data = sock_service.recv(1024)
 
-    #8 Aggiungi commento
+    #8 Calcolo della latenza del thread
     end_time_thread = time.time()
     print("Received: ", data.decode())
     print(f"{threading.current_thread().name} exec time = ", end_time_thread - start_time_thread)
@@ -50,16 +50,16 @@ def genera_richieste(address, port):
 if __name__ == "__main__":
     start_time = time.time()  # Tempo di inizio totale
 
-    #9 Aggiungi commento
+    #9 Crea i diversi thread
     threads = [
         threading.Thread(target=genera_richieste, args=(HOST, PORT))
         for _ in range(NUM_WORKERS)
     ]
 
-    #10 Aggiungi commento
+    #10 Fa partire tutti i thread
     [thread.start() for thread in threads]
 
-    #11 Aggiungi commento
+    #11 Aspetta che tutti i thread finiscanos
     [thread.join() for thread in threads]
 
     end_time = time.time()  # Tempo di fine totale
